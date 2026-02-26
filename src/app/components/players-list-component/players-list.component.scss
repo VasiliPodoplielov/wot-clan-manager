@@ -1,0 +1,23 @@
+.players-container {
+  max-width: 1300px;
+  margin: 0 auto;
+
+  ::v-deep {
+    .p-datatable-header {
+      background: white;
+      padding: 1.5rem;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+    }
+
+    .p-paginator {
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
+    }
+  }
+
+  // Колірні схеми для WN8 (кастомні за бажанням)
+  .p-tag-success { background: #4caf50; color: white; } // Good
+  .p-tag-info { background: #2196f3; color: white; }    // Great
+  .p-tag-warning { background: #ff9800; color: white; } // Average
+}

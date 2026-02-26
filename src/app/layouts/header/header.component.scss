@@ -1,0 +1,20 @@
+.header-container {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  ::v-deep {
+    .p-menubar {
+      border: none;
+      border-radius: 0;
+      padding: 0.5rem 1rem;
+      background: rgba(255, 255, 255, 0.95);
+    }
+
+    .p-menuitem-link {
+      &:hover {
+        background: var(--surface-hover);
+      }
+    }
+  }
+}
