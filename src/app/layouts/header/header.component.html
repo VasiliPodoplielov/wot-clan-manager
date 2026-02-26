@@ -1,0 +1,24 @@
+<div class="header-container shadow-2">
+  <p-menubar [model]="items">
+    <ng-template pTemplate="start">
+      <div class="flex align-items-center cursor-pointer px-3" (click)="navigateTo('/')">
+        <i class="pi pi-bolt text-primary text-3xl mr-2"></i>
+        <span class="text-xl font-bold uppercase tracking-tight text-900"
+          >Clan<span class="text-primary">Ops</span></span
+        >
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="end">
+      <div class="flex align-items-center gap-2">
+        <button
+          pButton
+          label="Увійти"
+          icon="pi pi-sign-in"
+          class="p-button-rounded p-button-outlined p-button-sm"
+          (click)="navigateTo('/login')"
+        ></button>
+      </div>
+    </ng-template>
+  </p-menubar>
+</div>

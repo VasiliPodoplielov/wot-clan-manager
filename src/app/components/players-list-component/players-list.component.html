@@ -1,0 +1,77 @@
+<div class="players-container p-4">
+  <div class="header-section mb-4 flex justify-content-between align-items-center">
+    <h2 class="m-0">Склад Клану</h2>
+    <p-button label="Оновити дані з WG" icon="pi pi-sync" severity="secondary"></p-button>
+  </div>
+
+  <p-table
+    #dt
+    [value]="players"
+    [loading]="loading"
+    [rows]="10"
+    [paginator]="true"
+    [globalFilterFields]="['nickname', 'role']"
+    responsiveLayout="stack"
+    [breakpoint]="'960px'"
+    styleClass="p-datatable-striped shadow-2 border-round-xl overflow-hidden"
+  >
+    <ng-template pTemplate="caption">
+      <div class="flex justify-content-end">
+        <p-iconfield iconPosition="left">
+          <p-inputicon class="pi pi-search"></p-inputicon>
+          <input
+            pInputText
+            type="text"
+            (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+            placeholder="Пошук бійця..."
+          />
+        </p-iconfield>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="nickname">Гравець <p-sortIcon field="nickname"></p-sortIcon></th>
+        <th pSortableColumn="role">Роль <p-sortIcon field="role"></p-sortIcon></th>
+        <th pSortableColumn="wn8">WN8 <p-sortIcon field="wn8"></p-sortIcon></th>
+        <th pSortableColumn="winrate">% Перемог <p-sortIcon field="winrate"></p-sortIcon></th>
+        <th pSortableColumn="battles">Боїв <p-sortIcon field="battles"></p-sortIcon></th>
+        <th>Профіль</th>
+        <th>Дії</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-player>
+      <tr>
+        <td>
+          <span class="font-bold">{{ player.nickname }}</span>
+        </td>
+        <td>
+          <p-tag [value]="player.role" severity="secondary"></p-tag>
+        </td>
+        <td>
+          <p-tag [value]="player.wn8" [severity]="getWn8Color(player.wn8)"></p-tag>
+        </td>
+        <td>{{ player.winrate }}</td>
+        <td>{{ player.battles | number }}</td>
+        <td>
+          <button
+            pButton
+            icon="pi pi-external-link"
+            label="Tomato.gg"
+            class="p-button-text p-button-sm"
+            (click)="openTomatoGG(player.nickname, player.id)"
+          ></button>
+        </td>
+        <td>
+          <button
+            pButton
+            icon="pi pi-pencil"
+            class="p-button-rounded p-button-info p-button-text"
+            pTooltip="Додати нотатку (Тільки офіцери)"
+          ></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
