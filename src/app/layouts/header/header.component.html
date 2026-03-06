@@ -3,21 +3,42 @@
     <ng-template pTemplate="start">
       <div class="flex align-items-center cursor-pointer px-3" (click)="navigateTo('/')">
         <i class="pi pi-bolt text-primary text-3xl mr-2"></i>
-        <span class="text-xl font-bold uppercase tracking-tight text-900"
-          >Clan<span class="text-primary">Ops</span></span
-        >
+        <span class="text-xl font-bold uppercase tracking-tight text-900">
+          Clan<span class="text-primary">Ops</span>
+        </span>
       </div>
     </ng-template>
 
     <ng-template pTemplate="end">
-      <div class="flex align-items-center gap-2">
-        <button
-          pButton
-          label="Увійти"
-          icon="pi pi-sign-in"
-          class="p-button-rounded p-button-outlined p-button-sm"
-          (click)="navigateTo('/login')"
-        ></button>
+      <div class="flex align-items-center gap-3 px-3">
+        @if (isLoggedIn()) {
+          <div class="flex align-items-center gap-3">
+            <div class="flex flex-column align-items-end px-3">
+              <span class="font-bold text-900 line-height-1">
+                Привіт, <span class="text-primary">{{ nickname() }}</span>
+              </span>
+            </div>
+
+            <p-divider layout="vertical" class="mx-0"></p-divider>
+
+            <button
+              pButton
+              icon="pi pi-sign-out"
+              class="p-button-rounded p-button-text p-button-danger p-button-sm"
+              (click)="logout()"
+              pTooltip="Вийти з системи"
+              tooltipPosition="bottom"
+            ></button>
+          </div>
+        } @else {
+          <button
+            pButton
+            label="Увійти"
+            icon="pi pi-sign-in"
+            class="p-button-rounded p-button-outlined p-button-sm"
+            (click)="navigateTo('/login')"
+          ></button>
+        }
       </div>
     </ng-template>
   </p-menubar>
