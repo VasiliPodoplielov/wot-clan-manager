@@ -5,41 +5,46 @@
       label="Wargaming.net"
       icon="pi pi-shield"
       class="p-button-raised p-button-danger mb-2"
-      (click)="loginWithWG()"
-    ></button>
-    <button
-      pButton
-      label="Google"
-      icon="pi pi-google"
-      class="p-button-raised p-button-secondary"
-      (click)="loginWithGoogle()"
+      (click)="loginWithWg()"
     ></button>
   </div>
 </ng-template>
 
 <div class="login-container">
   <p-card styleClass="login-card">
-    <p-tabs value="0">
+    <p-tabs [(value)]="activeTab">
       <p-tablist>
-        <p-tab value="0">Увійти</p-tab>
-        <p-tab value="1">Реєстрація</p-tab>
+        <p-tab [value]="0">Увійти</p-tab>
+        <p-tab [value]="1">Реєстрація</p-tab>
       </p-tablist>
 
       <p-tabpanels>
-        <p-tabpanel value="0">
-          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <p-tabpanel [value]="0">
+          <form [formGroup]="loginForm" (ngSubmit)="onLoginSubmit()">
             <div class="flex flex-column gap-2 mb-3">
-              <label for="email" class="font-bold">Email</label>
-              <input pInputText id="email" formControlName="email" type="email" class="w-full" />
+              <label for="email" class="font-bold">Email <span class="text-red-500">*</span></label>
+              <input
+                pInputText
+                id="email"
+                formControlName="email"
+                type="email"
+                class="w-full"
+                required
+                appValidationErrors
+              />
             </div>
             <div class="flex flex-column gap-2 mb-4">
-              <label for="password" class="font-bold">Пароль</label>
+              <label for="password" class="font-bold"
+                >Пароль <span class="text-red-500">*</span></label
+              >
               <input
                 pInputText
                 id="password"
                 formControlName="password"
                 type="password"
                 class="w-full"
+                required
+                appValidationErrors
               />
             </div>
             <button
@@ -47,7 +52,9 @@
               label="Увійти"
               icon="pi pi-sign-in"
               class="w-full"
-              [disabled]="!loginForm.valid"
+              [disabled]="loginForm.invalid"
+              [pTooltip]="loginForm.invalid ? 'Будь ласка, заповніть усі поля коректно' : ''"
+              tooltipPosition="bottom"
             ></button>
           </form>
 
@@ -56,21 +63,54 @@
           <ng-container *ngTemplateOutlet="socialButtons"></ng-container>
         </p-tabpanel>
 
-        <p-tabpanel value="1">
-          <div class="flex flex-column gap-3 mt-3">
-            <div class="flex flex-column gap-2">
-              <label class="font-bold">Ігровий нікнейм</label>
-              <input pInputText placeholder="Нік у грі" class="w-full" />
-            </div>
-            <div class="flex flex-column gap-2">
-              <label class="font-bold">Email</label>
-              <input pInputText type="email" class="w-full" />
-            </div>
-            <div class="flex flex-column gap-2">
-              <label class="font-bold">Пароль</label>
-              <input pInputText type="password" class="w-full" />
-            </div>
-            <button pButton label="Створити аккаунт" severity="success" class="w-full"></button>
+        <p-tabpanel [value]="1">
+          <div class="flex flex-column gap-3">
+            <form [formGroup]="registrationForm" (ngSubmit)="onRegistrationSubmit()">
+              <div class="flex flex-column gap-2 mb-3">
+                <label class="font-bold">Ігровий нікнейм <span class="text-red-500">*</span></label>
+                <input
+                  pInputText
+                  class="w-full"
+                  formControlName="nickname"
+                  required
+                  appValidationErrors
+                />
+              </div>
+              <div class="flex flex-column gap-2 mb-3">
+                <label class="font-bold">Email <span class="text-red-500">*</span></label>
+                <input
+                  pInputText
+                  type="email"
+                  class="w-full"
+                  formControlName="email"
+                  required
+                  appValidationErrors
+                />
+              </div>
+              <div class="flex flex-column gap-2 mb-4">
+                <label class="font-bold">Пароль <span class="text-red-500">*</span></label>
+                <input
+                  pInputText
+                  type="password"
+                  class="w-full"
+                  formControlName="password"
+                  required
+                  appValidationErrors
+                />
+              </div>
+
+              <button
+                pButton
+                label="Створити аккаунт"
+                icon="pi pi-sign-in"
+                class="w-full"
+                [disabled]="registrationForm.invalid"
+                [pTooltip]="
+                  registrationForm.invalid ? 'Будь ласка, заповніть усі поля коректно' : ''
+                "
+                tooltipPosition="bottom"
+              ></button>
+            </form>
           </div>
 
           <p-divider align="center">АБО</p-divider>

@@ -1,19 +1,29 @@
-import { Component, OnInit } from '@angular/core'; // Як ми і домовлялися :)
+import { Component, inject, OnInit } from '@angular/core'; // Як ми і домовлялися :)
 import { CommonModule } from '@angular/common';
 import { MenubarModule } from 'primeng/menubar';
 import { ButtonModule } from 'primeng/button';
 import { MenuItem } from 'primeng/api';
 import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { AuthService } from '../../services/auth-service';
+import { selectIsAuthenticated, selectNickname } from '../../store/auth/auth.selectors';
+import { DividerModule } from 'primeng/divider';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, MenubarModule, ButtonModule],
+  imports: [CommonModule, MenubarModule, ButtonModule, DividerModule],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
 })
 export class HeaderComponent {
   items: MenuItem[] | undefined;
+
+  private store = inject(Store);
+  private authService = inject(AuthService);
+
+  isLoggedIn = this.store.selectSignal(selectIsAuthenticated);
+  nickname = this.store.selectSignal(selectNickname);
 
   constructor(private router: Router) {
     this.items = [
@@ -41,6 +51,10 @@ export class HeaderComponent {
         ],
       },
     ];
+  }
+
+  logout() {
+    this.authService.logout();
   }
 
   navigateTo(path: string): void {
