@@ -6,7 +6,7 @@
 
   <p-table
     #dt
-    [value]="players"
+    [value]="(players$ | async) || []"
     [loading]="loading"
     [rows]="10"
     [paginator]="true"
@@ -33,8 +33,8 @@
       <tr>
         <th pSortableColumn="nickname">Гравець <p-sortIcon field="nickname"></p-sortIcon></th>
         <th pSortableColumn="role">Роль <p-sortIcon field="role"></p-sortIcon></th>
-        <th pSortableColumn="wn8">WN8 <p-sortIcon field="wn8"></p-sortIcon></th>
-        <th pSortableColumn="winrate">% Перемог <p-sortIcon field="winrate"></p-sortIcon></th>
+        <th pSortableColumn="wgRating">WG Rating <p-sortIcon field="wgRating"></p-sortIcon></th>
+        <th pSortableColumn="winRate">% Перемог <p-sortIcon field="winrate"></p-sortIcon></th>
         <th pSortableColumn="battles">Боїв <p-sortIcon field="battles"></p-sortIcon></th>
         <th>Профіль</th>
         <th>Дії</th>
@@ -50,7 +50,7 @@
           <p-tag [value]="player.role" severity="secondary"></p-tag>
         </td>
         <td>
-          <p-tag [value]="player.wn8" [severity]="getWn8Color(player.wn8)"></p-tag>
+          <p-tag [value]="player.wgRating" [severity]="getWn8Color(player.wn8)"></p-tag>
         </td>
         <td>{{ player.winrate }}</td>
         <td>{{ player.battles | number }}</td>
@@ -60,7 +60,7 @@
             icon="pi pi-external-link"
             label="Tomato.gg"
             class="p-button-text p-button-sm"
-            (click)="openTomatoGG(player.nickname, player.id)"
+            (click)="openTomatoGG(player.nickname, player.accountId)"
           ></button>
         </td>
         <td>

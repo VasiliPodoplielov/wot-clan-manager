@@ -6,16 +6,28 @@ import { TagModule } from 'primeng/tag';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { TooltipModule } from 'primeng/tooltip';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { endpoints } from '../../constants/endpoints';
+import {
+  catchError,
+  finalize,
+  firstValueFrom,
+  Observable,
+  of,
+  shareReplay,
+  Subject,
+  takeUntil,
+  tap,
+} from 'rxjs';
 
 interface Player {
-  id: number;
+  accountId: number;
   nickname: string;
   role: string;
-  wn8: number;
-  winrate: string;
+  wgRating: number;
+  winRate: string;
   battles: number;
-  lastSeen: string;
 }
 
 @Component({
@@ -34,43 +46,30 @@ interface Player {
   templateUrl: './players-list.component.html',
   styleUrls: ['./players-list.component.scss'],
 })
-export class PlayersListComponent implements OnInit {
-  players: Player[] = [];
+export class PlayersListComponent implements OnInit, OnDestroy {
+  private http = inject(HttpClient);
+  private destroy$ = new Subject<void>();
+  players$: Observable<Player[]> = of([]);
   loading = true;
 
   ngOnInit() {
-    // Тимчасові дані (Mock data) для візуалізації
-    this.players = [
-      {
-        id: 12345,
-        nickname: 'Tankist_UA',
-        role: 'Commander',
-        wn8: 2450,
-        winrate: '56%',
-        battles: 25000,
-        lastSeen: '2024-05-20',
-      },
-      {
-        id: 67890,
-        nickname: 'Cyber_Cossack',
-        role: 'Soldier',
-        wn8: 1850,
-        winrate: '52%',
-        battles: 12000,
-        lastSeen: '2024-05-21',
-      },
-      {
-        id: 11223,
-        nickname: 'Steel_Rain',
-        role: 'Officer',
-        wn8: 3100,
-        winrate: '61%',
-        battles: 45000,
-        lastSeen: '2024-05-21',
-      },
-    ];
+    this.loading = true;
 
-    this.loading = false;
+    this.players$ = this.http
+      .get<Player[]>(endpoints.wargaming.clanMembers, {
+        params: { clanId: 500311453 },
+      })
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.loading = false;
+        }),
+        catchError((err) => {
+          console.error('Помилка завантаження:', err);
+          this.loading = false;
+          return of([]);
+        }),
+      );
   }
 
   getWn8Color(wn8: number): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' {
@@ -82,5 +81,10 @@ export class PlayersListComponent implements OnInit {
 
   openTomatoGG(nickname: string, id: number) {
     window.open(`https://www.tomato.gg/stats/EU/${nickname}=${id}`, '_blank');
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

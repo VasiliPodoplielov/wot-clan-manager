@@ -7,13 +7,13 @@ import { Store } from '@ngrx/store';
 import { AuthActions } from '../store/auth/auth.actions';
 import { jwtDecode } from 'jwt-decode';
 import { MessageService } from 'primeng/api';
+import { endpoints } from '../constants/endpoints';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private http = inject(HttpClient);
   private store = inject(Store);
   private messageService = inject(MessageService);
-  private readonly API_URL = 'http://localhost:3000/auth';
 
   currentUser = signal<DecodedToken | null>(this.getStoredUser());
 
@@ -26,7 +26,7 @@ export class AuthService {
   }
 
   login(credentials: any) {
-    return this.http.post<{ access_token: string }>(`${this.API_URL}/login`, credentials).pipe(
+    return this.http.post<{ access_token: string }>(endpoints.auth.login, credentials).pipe(
       tap(({ access_token }) => {
         this.saveSession(access_token);
       }),
@@ -34,9 +34,7 @@ export class AuthService {
   }
 
   register(data: IRegisterData): Observable<any> {
-    return this.http
-      .post(`${this.API_URL}/register`, data)
-      .pipe(tap((res) => this.handleAuth(res)));
+    return this.http.post(endpoints.auth.register, data).pipe(tap((res) => this.handleAuth(res)));
   }
 
   saveSession(token: string) {
