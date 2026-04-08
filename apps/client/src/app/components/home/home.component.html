@@ -1,0 +1,53 @@
+<div class="home-container">
+  <section class="hero-section p-shadow-2">
+    <h1>Клан [Твій Тег] — Підготовка до Маневрів</h1>
+    <p>Збираємо кращих бійців для домінування на мапі. Приєднуйся до складу!</p>
+    <button
+      pButton
+      label="Переглянути список гравців"
+      icon="pi pi-users"
+      class="p-button-raised p-button-secondary"
+      routerLink="/players"
+    ></button>
+  </section>
+
+  <div class="grid p-fluid mt-4">
+    <div class="col-12 md:col-6">
+      <p-card header="Про івент: Маневри" subheader="Що нас чекає?" styleClass="h-full">
+        <p>
+          Маневри — це випробування на витривалість та тактику. Ми формуємо стабільні роти для
+          щоденних виїздів.
+        </p>
+        <ul>
+          <li><strong>Вимоги:</strong> WN8 2000+, наявність 3+ танків 10 рівня.</li>
+          <li><strong>Прайм-тайм:</strong> 19:00 — 23:00 за Києвом.</li>
+          <li><strong>Нагороди:</strong> Бони, танки, унікальні стилі.</li>
+        </ul>
+      </p-card>
+    </div>
+
+    <div class="col-12 md:col-6">
+      <p-card header="Подати заявку на участь" styleClass="h-full">
+        <div class="flex flex-column gap-2 mb-3">
+          <label for="nickname">Ігровий нікнейм</label>
+          <input id="nickname" type="text" pInputText placeholder="Напр: Tank_Master_UA" />
+        </div>
+
+        <div class="flex flex-column gap-2 mb-3">
+          <label for="tank">Основний танк (ТТ/СТ/ПТ)</label>
+          <input id="tank" type="text" pInputText placeholder="Об'єкт 277, Super Conqueror..." />
+        </div>
+
+        <div class="flex align-items-center gap-2 mb-3">
+          <p-checkbox binary="true" inputId="discord" label="Маю Discord та мікрофон"></p-checkbox>
+          <label for="discord" class="cursor-pointer">Маю Discord та мікрофон</label>
+        </div>
+
+        <p-button label="Відправити заявку" icon="pi pi-check" severity="success"></p-button>
+        <small class="block mt-2 text-secondary"
+          >* Дані профілю будуть підтягнуті автоматично через WG API після обробки.</small
+        >
+      </p-card>
+    </div>
+  </div>
+</div>
