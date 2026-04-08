@@ -1,13 +1,18 @@
 <div class="players-container p-4">
   <div class="header-section mb-4 flex justify-content-between align-items-center">
     <h2 class="m-0">Склад Клану</h2>
-    <p-button label="Оновити дані з WG" icon="pi pi-sync" severity="secondary"></p-button>
+    <p-button
+      label="Оновити дані з WG"
+      icon="pi pi-sync"
+      severity="secondary"
+      (click)="userService.getUsers()"
+    ></p-button>
   </div>
 
   <p-table
     #dt
-    [value]="(players$ | async) || []"
-    [loading]="loading"
+    [value]="(users$ | async) || []"
+    [loading]="userService.loading"
     [rows]="10"
     [paginator]="true"
     [globalFilterFields]="['nickname', 'role']"
@@ -50,9 +55,16 @@
           <p-tag [value]="player.role" severity="secondary"></p-tag>
         </td>
         <td>
-          <p-tag [value]="player.wgRating" [severity]="getWn8Color(player.wn8)"></p-tag>
+          <p-tag
+            [value]="player.wgRating"
+            [style]="{
+              'background-color': (player.wgRating | wgRatingColor),
+              color: '#ffffff',
+              'border-color': 'transparent',
+            }"
+          ></p-tag>
         </td>
-        <td>{{ player.winrate }}</td>
+        <td>{{ player.winRate }}%</td>
         <td>{{ player.battles | number }}</td>
         <td>
           <button

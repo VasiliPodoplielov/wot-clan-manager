@@ -8,7 +8,7 @@ export interface DecodedToken {
   sub: number;
   wgAccountId: string;
   nickname: string;
-  email: string;
+  email?: string;
   role: UserRole;
   iat: number;
   exp: number;
