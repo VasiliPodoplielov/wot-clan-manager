@@ -25,15 +25,12 @@ export class WargamingService {
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
   ) {
-    this.applicationId =
-      this.configService.getOrThrow<string>('WG_APPLICATION_ID');
+    this.applicationId = this.configService.getOrThrow<string>('WG_APPLICATION_ID');
     this.redirectUri = this.configService.getOrThrow<string>('WG_REDIRECT_URI');
     this.authUrl =
-      this.configService.get<string>('WG_AUTH_URL') ??
-      `${this.baseWgEndpoint}/auth/login/`;
+      this.configService.get<string>('WG_AUTH_URL') ?? `${this.baseWgEndpoint}/auth/login/`;
     this.profileUrl =
-      this.configService.get<string>('WG_PROFILE_URL') ??
-      `${this.baseWgEndpoint}/account/info/`;
+      this.configService.get<string>('WG_PROFILE_URL') ?? `${this.baseWgEndpoint}/account/info/`;
     this.accountListUrl =
       this.configService.get<string>('WG_ACCOUNT_LIST_URL') ??
       `${this.baseWgEndpoint}/account/list/?${this.applicationId}`;
@@ -81,11 +78,7 @@ export class WargamingService {
     const response$ = this.httpService.get(url.toString());
     const { data } = await firstValueFrom(response$);
 
-    if (
-      data.status !== 'ok' ||
-      !Array.isArray(data.data) ||
-      data.data.length === 0
-    ) {
+    if (data.status !== 'ok' || !Array.isArray(data.data) || data.data.length === 0) {
       throw new Error('Wargaming account not found');
     }
 
@@ -105,10 +98,7 @@ export class WargamingService {
       throw new Error('Invalid Wargaming callback');
     }
 
-    const profile = await this.getProfileByToken(
-      params.access_token,
-      params.account_id,
-    );
+    const profile = await this.getProfileByToken(params.access_token, params.account_id);
     return profile;
   }
 

@@ -64,7 +64,7 @@ export class PlayersListComponent implements OnInit, OnDestroy {
         finalize(() => {
           this.loading = false;
         }),
-        catchError((err) => {
+        catchError(err => {
           console.error('Помилка завантаження:', err);
           this.loading = false;
           return of([]);

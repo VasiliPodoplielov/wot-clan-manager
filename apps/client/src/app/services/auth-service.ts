@@ -34,7 +34,7 @@ export class AuthService {
   }
 
   register(data: IRegisterData): Observable<any> {
-    return this.http.post(endpoints.auth.register, data).pipe(tap((res) => this.handleAuth(res)));
+    return this.http.post(endpoints.auth.register, data).pipe(tap(res => this.handleAuth(res)));
   }
 
   saveSession(token: string) {

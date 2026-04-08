@@ -21,7 +21,7 @@ export class ValidationErrorsDirective implements OnInit, OnDestroy {
   private errorMessages: Record<string, (args: any) => string> = {
     required: () => 'Це поле є обов’язковим',
     email: () => 'Невірний формат email',
-    minlength: (args) => `Мінімум символів: ${args.requiredLength}`,
+    minlength: args => `Мінімум символів: ${args.requiredLength}`,
   };
 
   constructor(

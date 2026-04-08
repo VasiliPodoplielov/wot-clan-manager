@@ -20,9 +20,7 @@ export class UsersService {
     let wgAccountId = userData.wgAccountId;
 
     if (!wgAccountId && userData.nickname) {
-      const profile = await this.wargamingService.findAccountByNickname(
-        userData.nickname,
-      );
+      const profile = await this.wargamingService.findAccountByNickname(userData.nickname);
 
       wgAccountId = String(profile.accountId);
     }
@@ -39,10 +37,7 @@ export class UsersService {
     return this.usersRepository.findOne({ where: { wgAccountId } });
   }
 
-  async createFromWargaming(
-    accountId: string,
-    nickname: string,
-  ): Promise<User> {
+  async createFromWargaming(accountId: string, nickname: string): Promise<User> {
     // Якщо юзер існує з таким nickname (але ще без wgAccountId) – лінкуємо WG акаунт
     const existingByNickname = await this.usersRepository.findOne({
       where: { nickname },

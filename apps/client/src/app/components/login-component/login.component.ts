@@ -111,7 +111,7 @@ export class LoginComponent implements OnDestroy {
             detail: 'Вхід виконано успішно.',
           });
         },
-        error: (err) => {
+        error: err => {
           this.messageService.add({
             severity: 'error',
             detail: 'Помилка при вході. Повторіть спробу або зверніться до офіцерів клану.',
@@ -132,7 +132,7 @@ export class LoginComponent implements OnDestroy {
       };
 
       this.authService.register(payload).subscribe({
-        next: (response) => {
+        next: response => {
           this.registrationForm.reset();
           this.activeTab.set(0);
 
@@ -142,7 +142,7 @@ export class LoginComponent implements OnDestroy {
             detail: 'Реєстрація пройдена успішно.',
           });
         },
-        error: (err) => {
+        error: err => {
           this.messageService.add({
             severity: 'error',
             detail: 'Помилка при реєстрації. Повторіть спробу або зверніться до офіцерів клану.',

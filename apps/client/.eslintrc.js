@@ -48,7 +48,7 @@ module.exports = {
         'plugin:prettier/recommended',
       ],
       rules: {
-        "@angular-eslint/template/elements-content": "off"
+        '@angular-eslint/template/elements-content': 'off',
       },
     },
   ],

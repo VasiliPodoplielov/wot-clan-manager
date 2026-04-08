@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  BadRequestException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -55,10 +51,7 @@ export class AuthService {
 
     // 3. Якщо нема – створити
     if (!user) {
-      user = await this.usersService.createFromWargaming(
-        String(accountId),
-        nickname,
-      );
+      user = await this.usersService.createFromWargaming(String(accountId), nickname);
     }
 
     // 4. Зібрати payload і видати JWT

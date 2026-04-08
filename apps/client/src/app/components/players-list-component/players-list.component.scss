@@ -17,7 +17,16 @@
   }
 
   // Колірні схеми для WN8 (кастомні за бажанням)
-  .p-tag-success { background: #4caf50; color: white; } // Good
-  .p-tag-info { background: #2196f3; color: white; }    // Great
-  .p-tag-warning { background: #ff9800; color: white; } // Average
+  .p-tag-success {
+    background: #4caf50;
+    color: white;
+  } // Good
+  .p-tag-info {
+    background: #2196f3;
+    color: white;
+  } // Great
+  .p-tag-warning {
+    background: #ff9800;
+    color: white;
+  } // Average
 }

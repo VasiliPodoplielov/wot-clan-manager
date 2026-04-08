@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Redirect,
-  Get,
-  Query,
-  Res,
-} from '@nestjs/common';
+import { Controller, Post, Body, Redirect, Get, Query, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { WargamingService } from '../wargaming/wargaming.service';
 import type { Response } from 'express';
