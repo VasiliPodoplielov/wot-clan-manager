@@ -72,24 +72,10 @@ export class LoginComponent implements OnDestroy {
     this.resetAllForms();
   }
 
-  onTabChange(value: number) {
-    this.activeTab.set(value);
-    this.resetAllForms();
-  }
-
   resetAllForms() {
     this.loginForm.reset();
     this.registrationForm.reset();
     console.log('resetAllForms');
-  }
-
-  loginWithWG() {
-    console.log('Redirecting to Wargaming OpenID...');
-    // Тут буде лінк на твій бекенд, який редіректне на WG
-  }
-
-  loginWithGoogle() {
-    console.log('Login with Google...');
   }
 
   onLoginSubmit() {

@@ -6,3 +6,9 @@ export interface ClanMemberStats {
   winRate: number;
   battles: number;
 }
+
+export interface UserWGData {
+  accountId: number;
+  nickname: string;
+  clan_id: number;
+}

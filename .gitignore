@@ -44,3 +44,11 @@ Thumbs.db
 # Misc
 *.pem
 .cache
+
+./.claude
+./.agents
+./.codex
+./.cursor
+./.gemini
+./.opencode
+./.vscode

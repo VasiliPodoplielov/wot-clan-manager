@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 import { WargamingService } from './wargaming.service';
 import { ClanMemberStats } from './wargaming.models';
 
@@ -7,7 +7,7 @@ export class WargamingController {
   constructor(private readonly wargamingService: WargamingService) {}
 
   @Get('clan-members')
-  getClanMembers(@Query() query: { clanId: string }): Promise<ClanMemberStats[]> {
-    return this.wargamingService.getClanMembers(query.clanId);
+  getClanMembers(@Param() params: { clanId: string }): Promise<ClanMemberStats[]> {
+    return this.wargamingService.getClanMembers(params.clanId);
   }
 }
