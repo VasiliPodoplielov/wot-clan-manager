@@ -1,0 +1,76 @@
+<p-card>
+  <ng-template pTemplate="header">
+    <div class="border-bottom-1 surface-border px-5 py-4">
+      <div class="text-2xl font-semibold text-900">{{ eventName() }}</div>
+      <p class="mt-2 text-sm text-600">
+        Подай заявку на участь у 14-денному івенті клану та підтвердь свою готовність до
+        прайм-тайму.
+      </p>
+    </div>
+  </ng-template>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-column gap-5 p-1 sm:p-2">
+    <div class="border-1 border-blue-200 bg-blue-50 border-round-lg px-4 py-3 text-sm text-900">
+      <div class="flex flex-col gap-2 leading-6">
+        <div>
+          <span class="font-semibold">Дата івенту:</span>
+          {{ eventStartDate() }} - {{ eventEndDate() }} (14 днів)
+        </div>
+        <div>
+          <span class="font-semibold">Клановий прайм:</span>
+          {{ primeTime() }} Київський час.
+        </div>
+        <div>
+          <span class="font-semibold">Зв'язок:</span>
+          Встановлений діскорд + наявність мікрофону обов'язково.
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-column gap-2">
+      <div class="flex items-start gap-3">
+        <p-checkbox inputId="isReadyForPrime" binary="true" formControlName="isReadyForPrime" />
+        <label for="isReadyForPrime" class="line-height-3 text-900">
+          Я ознайомився з прайм-таймом та готовий відіграти 14 днів по 2 години щодня.
+        </label>
+      </div>
+
+      @if (showReadyError()) {
+        <p-message severity="error" text="Потрібно підтвердити готовність до прайм-тайму." />
+      }
+    </div>
+
+    <div class="flex flex-column gap-2">
+      <div class="flex items-start gap-3">
+        <p-checkbox inputId="canLead" binary="true" formControlName="canLead" />
+        <label for="canLead" class="line-height-3 text-900">
+          Маю досвід та/або бажання командувати підрозділом (Польовий командир).
+        </label>
+      </div>
+    </div>
+
+    <div class="flex flex-column gap-2">
+      <label for="additionalInfo" class="font-medium text-900">
+        Додаткова інформація (досвід, необхідність заміни на декілька днів, побажання).
+      </label>
+      <textarea
+        pInputTextarea
+        id="additionalInfo"
+        formControlName="additionalInfo"
+        [autoResize]="true"
+        rows="5"
+        class="w-full"
+        placeholder="Наприклад: досвід командної гри, комфортна роль у складі..."
+      ></textarea>
+    </div>
+
+    <div class="flex justify-end pt-2">
+      <p-button
+        type="submit"
+        label="Надіслати заявку"
+        [loading]="submitting()"
+        [disabled]="!canSubmit()"
+      />
+    </div>
+  </form>
+</p-card>

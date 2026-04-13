@@ -37,7 +37,7 @@ export class UsersService {
     return this.usersRepository.findOne({ where: { wgAccountId } });
   }
 
-  async createFromWargaming(accountId: string, nickname: string): Promise<User> {
+  async createByWGAccountId(accountId: string, nickname: string): Promise<User> {
     // Якщо юзер існує з таким nickname (але ще без wgAccountId) – лінкуємо WG акаунт
     const existingByNickname = await this.usersRepository.findOne({
       where: { nickname },

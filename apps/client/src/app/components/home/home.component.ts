@@ -6,6 +6,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { CheckboxModule } from 'primeng/checkbox';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { ApplicationFormComponent } from '../application-form/application-form.component';
 
 @Component({
   selector: 'app-home',
@@ -18,6 +19,7 @@ import { FormsModule } from '@angular/forms';
     CheckboxModule,
     FormsModule,
     RouterModule,
+    ApplicationFormComponent,
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
