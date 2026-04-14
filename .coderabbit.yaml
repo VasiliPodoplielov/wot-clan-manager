@@ -23,7 +23,6 @@ reviews:
       - "DO NOT MERGE"
 
   request_changes_workflow: false
-  finishing_touches: false
 
   nitpick_settings:
     enabled: false
