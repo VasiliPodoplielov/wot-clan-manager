@@ -1,0 +1,150 @@
+# CodeRabbit — NX monorepo
+# apps/client (Angular) + apps/server (DB + NestJS API)
+# Фокус: баги, security, performance, архітектура + стиль
+# Рівень: баги + важливі покращення (без нітпікінгу)
+
+language: "uk"
+
+reviews:
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+
+  auto_review:
+    enabled: true
+    drafts: false
+    ignore_title_keywords:
+      - "WIP"
+      - "wip"
+      - "draft"
+      - "DO NOT MERGE"
+
+  request_changes_workflow: false
+  finishing_touches: false
+
+  nitpick_settings:
+    enabled: false
+
+  path_filters:
+    - "!dist/**"
+    - "!**/*.min.js"
+    - "!**/*.min.css"
+    - "!**/*.lock"
+    - "!**/node_modules/**"
+    - "!**/__snapshots__/**"
+    - "!**/*.generated.ts"
+    - "!nx.json"
+    - "!project.json"
+    - "!angular.json"
+    - "!.eslintrc*"
+    - "!.prettierrc*"
+    - "!**/*.scss"
+    - "!**/*.css"
+
+  instructions: |
+    Ти рев'юєр для NX monorepo:
+    - apps/client — Angular frontend
+    - apps/server — NestJS API + database layer (міграції, entities, репозиторії)
+
+    ЗАВЖДИ перевіряй:
+    - Логічні помилки та баги
+    - Security вразливості (injection, auth bypass, витік даних)
+    - Performance проблеми (memory leaks, N+1, change detection)
+    - Breaking changes у спільних інтерфейсах між client і server
+    - Архітектурні порушення та NX boundary violations
+    - Грубі порушення стилю що впливають на читабельність всієї команди
+
+    НІКОЛИ не коментуй:
+    - Незначні різниці у стилі (лапки, пробіли, довжина рядка)
+    - SCSS/CSS класи та структуру шаблонів
+    - Відсутні JSDoc якщо код і так зрозумілий
+    - Суб'єктивні переваги у виборі підходу коли обидва коректні
+
+    Коментуй стиль ТІЛЬКИ якщо це реальна проблема читабельності
+    або суперечить очевидному патерну решти кодової бази.
+
+  path_instructions:
+
+    - path: "apps/client/**"
+      instructions: |
+        Angular frontend. Перевіряй:
+
+        БАГИ:
+        - Підписки на Observable без unsubscribe — відсутній
+          takeUntilDestroyed, AsyncPipe або ngOnDestroy cleanup
+        - Некоректний OnPush: мутація об'єктів замість нових референцій,
+          відсутній markForCheck() де необхідно
+        - Логіка в конструкторі що має бути в ngOnInit
+        - Race conditions у switchMap / combineLatest / mergeMap
+
+        SECURITY:
+        - bypassSecurityTrustHtml або bypassSecurityTrustScript
+          без обґрунтування у коментарі
+        - Чутливі дані (токени, паролі) у localStorage / sessionStorage
+        - [innerHTML] binding без явної санітизації
+
+        PERFORMANCE:
+        - Виклики методів в інтерполяції {{ method() }} — спрацьовує
+          при кожному change detection циклі, замінити на pipe або signal
+        - *ngFor без trackBy для динамічних списків
+        - Відсутній OnPush де компонент отримує лише @Input дані
+
+        АРХІТЕКТУРА:
+        - Бізнес-логіка в компоненті замість сервісу
+        - Імпорт з apps/server напряму (порушення NX boundary)
+        - HTTP запити з компонента минаючи сервісний шар
+
+    - path: "apps/client/**/*.html"
+      instructions: |
+        Angular шаблони. Перевіряй лише:
+        - {{ method() }} в інтерполяції — зайві обчислення при CD
+        - *ngFor без trackBy
+        - [innerHTML] без sanitization
+        Не коментуй структуру HTML, атрибути та CSS класи.
+
+    - path: "apps/server/**"
+      instructions: |
+        NestJS API + database layer. Перевіряй:
+
+        БАГИ:
+        - Необроблені Promise rejections, відсутній try/catch в async
+        - Некоректна логіка в Guards / Pipes / Interceptors
+        - Неправильне використання Scope.REQUEST (singleton vs request-scoped)
+        - Circular dependencies між NestJS модулями
+
+        SECURITY:
+        - Відсутній @UseGuards() на захищених endpoints
+        - Відсутня валідація DTO через class-validator
+        - SQL injection через сирі запити без параметризації
+        - Витік внутрішніх полів у response (паролі, хеші, id)
+        - Відсутній rate limiting на публічних або auth endpoints
+        - Надмірні права доступу до БД у connection string
+
+        PERFORMANCE:
+        - N+1 запити — відсутній eager loading або QueryBuilder join
+        - Відсутній індекс для полів що використовуються у WHERE/ORDER
+        - Завантаження всієї таблиці без пагінації або ліміту
+        - Синхронні операції що блокують event loop
+
+        DATABASE (міграції та entities):
+        - Міграція що видаляє або перейменовує колонку без перехідного етапу
+        - Відсутній nullable або default value для нової колонки
+          в існуючій таблиці з даними — зламає міграцію на prod
+        - Cascade delete без явного обґрунтування
+
+        АРХІТЕКТУРА:
+        - Бізнес-логіка в Controller замість Service
+        - Прямий доступ до Entity/Repository з Controller
+        - Імпорт з apps/client напряму (порушення NX boundary)
+
+    - path: "**/*.spec.ts"
+      instructions: |
+        Тести. Перевіряй лише:
+        - Тест перевіряє не те що заявлено в describe/it
+        - Некоректні mock'и що приховують реальну поведінку
+        - Відсутній cleanup підписок або таймерів після тесту
+        Не коментуй структуру та стиль тестів.
+
+chat:
+  auto_reply: true
