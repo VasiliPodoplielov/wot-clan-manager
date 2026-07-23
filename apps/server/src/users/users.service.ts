@@ -16,18 +16,14 @@ export class UsersService {
     return this.usersRepository.findOne({ where: { email } });
   }
 
-  async create(userData: Partial<User>): Promise<User> {
-    let wgAccountId = userData.wgAccountId;
-
-    if (!wgAccountId && userData.nickname) {
-      const profile = await this.wargamingService.findAccountByNickname(userData.nickname);
-
-      wgAccountId = String(profile.accountId);
-    }
+  async create(userData: { email: string; nickname: string; password: string }): Promise<User> {
+    const profile = await this.wargamingService.findAccountByNickname(userData.nickname);
 
     const newUser = this.usersRepository.create({
-      ...userData,
-      wgAccountId,
+      email: userData.email,
+      nickname: userData.nickname,
+      password: userData.password,
+      wgAccountId: String(profile.accountId),
     });
 
     return this.usersRepository.save(newUser);
