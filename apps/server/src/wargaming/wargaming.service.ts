@@ -27,13 +27,9 @@ export class WargamingService {
   ) {
     this.applicationId = this.configService.getOrThrow<string>('WG_APPLICATION_ID');
     this.redirectUri = this.configService.getOrThrow<string>('WG_REDIRECT_URI');
-    this.authUrl =
-      this.configService.get<string>('WG_AUTH_URL') ?? `${this.baseWgEndpoint}/auth/login/`;
-    this.profileUrl =
-      this.configService.get<string>('WG_PROFILE_URL') ?? `${this.baseWgEndpoint}/account/info/`;
-    this.accountListUrl =
-      this.configService.get<string>('WG_ACCOUNT_LIST_URL') ??
-      `${this.baseWgEndpoint}/account/list/?${this.applicationId}`;
+    this.authUrl = `${this.baseWgEndpoint}/auth/login/`;
+    this.profileUrl = `${this.baseWgEndpoint}/account/info/`;
+    this.accountListUrl = `${this.baseWgEndpoint}/account/list/?${this.applicationId}`; //TODO: Check if it is save
   }
 
   buildLoginUrl(): string {
@@ -45,13 +41,12 @@ export class WargamingService {
     return url.toString();
   }
 
-  async getProfileByToken(accessToken: string, accountId: string) {
+  async getProfileByAccountId(accountId: string) {
     const url = new URL(this.profileUrl);
 
     url.searchParams.set('application_id', this.applicationId);
     url.searchParams.set('account_id', accountId);
-    url.searchParams.set('access_token', accessToken);
-    url.searchParams.set('fields', 'account_id,nickname');
+    url.searchParams.set('fields', 'account_id,nickname,clan_id');
 
     const response$ = this.httpService.get(url.toString());
     const { data } = await firstValueFrom(response$);
@@ -62,9 +57,12 @@ export class WargamingService {
 
     const [profile] = Object.values<any>(data.data);
 
+    console.log(data.data);
+
     return {
       accountId: profile.account_id,
       nickname: profile.nickname,
+      clan_id: profile.clan_id,
     };
   }
 
@@ -90,15 +88,12 @@ export class WargamingService {
     };
   }
 
-  /**
-   * Метод для обробки query з callback'а WG (схема може трохи відрізнятися залежно від протоколу).
-   */
   async handleCallback(params: WgLoginParams) {
-    if (params.status !== 'ok' || !params.access_token) {
+    if (params.status !== 'ok') {
       throw new Error('Invalid Wargaming callback');
     }
 
-    const profile = await this.getProfileByToken(params.access_token, params.account_id);
+    const profile = await this.getProfileByAccountId(params.account_id);
     return profile;
   }
 

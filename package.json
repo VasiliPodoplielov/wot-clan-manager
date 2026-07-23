@@ -13,8 +13,8 @@
     "format:write": "nx format:write",
     "code:check": "nx run-many -t lint --all && nx format:check",
     "code:fix": "nx run-many -t lint --all --fix && nx format:write",
-    "server:dev": "nx serve server",
     "client:dev": "nx serve client",
+    "server:dev": "nx serve server",
     "dev": "nx run-many -t serve -p server,client --parallel --outputStyle=stream"
   },
   "dependencies": {

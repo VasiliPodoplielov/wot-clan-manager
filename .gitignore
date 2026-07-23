@@ -44,3 +44,15 @@ Thumbs.db
 # Misc
 *.pem
 .cache
+
+/.claude
+/.agents
+/.codex
+/.cursor
+/.gemini
+/.opencode
+/.vscode
+
+AGENTS.md
+CLAUDE.md
+opencode.json

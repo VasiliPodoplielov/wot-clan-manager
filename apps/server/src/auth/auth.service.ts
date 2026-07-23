@@ -3,6 +3,15 @@ import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { WargamingService } from '../wargaming/wargaming.service';
+import { User } from '../users/entities/user.entity';
+import {
+  AuthJwtPayload,
+  AuthTokenResponse,
+  LoginDto,
+  RegisterDto,
+  WargamingAuthResponse,
+  WargamingCallbackParams,
+} from 'src/auth/auth.types';
 
 @Injectable()
 export class AuthService {
@@ -12,7 +21,7 @@ export class AuthService {
     private readonly wargamingService: WargamingService,
   ) {}
 
-  async register(dto: any) {
+  async register(dto: RegisterDto): Promise<AuthTokenResponse> {
     const candidate = await this.usersService.findOneByEmail(dto.email);
 
     if (candidate) {
@@ -28,7 +37,7 @@ export class AuthService {
     return this.generateToken(user);
   }
 
-  async login(dto: any) {
+  async login(dto: LoginDto): Promise<AuthTokenResponse> {
     const user = await this.usersService.findOneByEmail(dto.email);
 
     if (!user) throw new UnauthorizedException("Ім'я користувача не знайдено");
@@ -41,24 +50,24 @@ export class AuthService {
     return this.generateToken(user);
   }
 
-  async loginWithWargaming(callbackParams: any) {
-    // 1. Отримати профіль від WG через сервіс
+  async loginWithWargaming(
+    callbackParams: WargamingCallbackParams,
+  ): Promise<WargamingAuthResponse> {
     const profile = await this.wargamingService.handleCallback(callbackParams);
     const { accountId, nickname } = profile;
 
-    // 2. Спробувати знайти користувача
     let user = await this.usersService.findOneByWgAccountId(String(accountId));
 
-    // 3. Якщо нема – створити
     if (!user) {
-      user = await this.usersService.createFromWargaming(String(accountId), nickname);
+      user = await this.usersService.createByWGAccountId(String(accountId), nickname);
     }
 
-    // 4. Зібрати payload і видати JWT
-    const payload = {
+    const payload: AuthJwtPayload = {
       sub: user.id,
       wgAccountId: user.wgAccountId,
       nickname: user.nickname,
+      role: user.role,
+      email: user.email,
     };
 
     return {
@@ -67,12 +76,13 @@ export class AuthService {
     };
   }
 
-  private generateToken(user: any) {
-    const payload = {
+  private generateToken(user: User): AuthTokenResponse {
+    const payload: AuthJwtPayload = {
       email: user.email,
       sub: user.id,
       nickname: user.nickname,
       role: user.role,
+      wgAccountId: user.wgAccountId,
     };
 
     return {

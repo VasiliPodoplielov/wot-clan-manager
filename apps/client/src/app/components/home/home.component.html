@@ -27,27 +27,7 @@
     </div>
 
     <div class="col-12 md:col-6">
-      <p-card header="Подати заявку на участь" styleClass="h-full">
-        <div class="flex flex-column gap-2 mb-3">
-          <label for="nickname">Ігровий нікнейм</label>
-          <input id="nickname" type="text" pInputText placeholder="Напр: Tank_Master_UA" />
-        </div>
-
-        <div class="flex flex-column gap-2 mb-3">
-          <label for="tank">Основний танк (ТТ/СТ/ПТ)</label>
-          <input id="tank" type="text" pInputText placeholder="Об'єкт 277, Super Conqueror..." />
-        </div>
-
-        <div class="flex align-items-center gap-2 mb-3">
-          <p-checkbox binary="true" inputId="discord" label="Маю Discord та мікрофон"></p-checkbox>
-          <label for="discord" class="cursor-pointer">Маю Discord та мікрофон</label>
-        </div>
-
-        <p-button label="Відправити заявку" icon="pi pi-check" severity="success"></p-button>
-        <small class="block mt-2 text-secondary"
-          >* Дані профілю будуть підтягнуті автоматично через WG API після обробки.</small
-        >
-      </p-card>
+      <app-application-form></app-application-form>
     </div>
   </div>
 </div>

@@ -1,13 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import {
-  BehaviorSubject,
-  catchError,
-  finalize,
-  Observable,
-  of,
-  Subscription,
-} from 'rxjs';
+import { BehaviorSubject, catchError, finalize, Observable, of, Subscription } from 'rxjs';
 import { endpoints } from '../constants/endpoints';
 import { UserInfo } from '../models/user-models';
 import { CLAN_ID } from '../constants/clanData';
