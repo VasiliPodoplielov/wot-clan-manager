@@ -2,6 +2,7 @@ import { Controller, Post, Body, Redirect, Get, Query, Res } from '@nestjs/commo
 import { AuthService } from './auth.service';
 import { WargamingService } from '../wargaming/wargaming.service';
 import type { Response } from 'express';
+import type { LoginDto, RegisterDto } from './auth.types';
 
 @Controller('auth')
 export class AuthController {
@@ -11,12 +12,12 @@ export class AuthController {
   ) {}
 
   @Post('register')
-  register(@Body() dto: any) {
+  register(@Body() dto: RegisterDto) {
     return this.authService.register(dto);
   }
 
   @Post('login')
-  login(@Body() dto: any) {
+  login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
   }
 
@@ -38,7 +39,7 @@ export class AuthController {
 
     try {
       const result = await this.authService.loginWithWargaming(query);
-      const redirectUrl = `${FRONT_URL}/auth/callback?token=${result.token}`;
+      const redirectUrl = `${FRONT_URL}/auth/callback#token=${encodeURIComponent(result.token)}`;
       return res.redirect(302, redirectUrl);
     } catch {
       return res.redirect(302, FRONT_URL);

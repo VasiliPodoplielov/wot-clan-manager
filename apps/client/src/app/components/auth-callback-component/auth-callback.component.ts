@@ -15,7 +15,8 @@ export class AuthCallbackComponent implements OnInit {
   private authService = inject(AuthService);
 
   ngOnInit(): void {
-    const token = this.route.snapshot.queryParamMap.get('token');
+    const fragment = this.route.snapshot.fragment ?? '';
+    const token = new URLSearchParams(fragment).get('token');
 
     if (token) {
       this.authService.saveSession(token);

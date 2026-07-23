@@ -1,59 +1,73 @@
-# WotClanManager
+# WoT Clan Manager
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.4.
+A web application for managing a World of Tanks clan: member roster with live Wargaming stats, WG OpenID / email login, role-based access (member / officer / moderator), and event sign-up forms (e.g. Maneuvers).
 
-## Development server
+Nx monorepo with two apps:
 
-To start a local development server, run:
+- **`apps/client`** — Angular 21 (standalone components, signals, NgRx, PrimeNG)
+- **`apps/server`** — NestJS 11 (TypeORM + PostgreSQL, JWT auth, Wargaming API integration)
+
+## Prerequisites
+
+- Node.js and npm
+- A PostgreSQL database
+
+## Setup
+
+Install dependencies:
 
 ```bash
-ng serve
+npm install
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Create a `.env` file at the repo root (read by `apps/server`) with:
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```
+DB_HOST=
+DB_PORT=
+DB_USERNAME=
+DB_PASSWORD=
+DB_DATABASE=
+JWT_SECRET=
+WG_APPLICATION_ID=
+WG_REDIRECT_URI=
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+`WG_APPLICATION_ID` is a Wargaming API application ID (https://developers.wargaming.net/). `WG_REDIRECT_URI` must match the callback route registered there and point at the client's `/auth/callback` route.
+
+## Development
+
+Run both apps together:
 
 ```bash
-ng generate --help
+npm run dev
+```
+
+Or individually:
+
+```bash
+npm run client:dev   # Angular dev server, http://localhost:4200
+npm run server:dev   # NestJS server, http://localhost:3000
 ```
 
 ## Building
 
-To build the project run:
-
 ```bash
-ng build
+npm run build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Testing
 
 ```bash
-ng test
+npm test
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+## Linting & formatting
 
 ```bash
-ng e2e
+npm run lint
+npm run format:check
+npm run code:check   # lint + format:check
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+See [CLAUDE.md](CLAUDE.md) for architecture notes and guidance on working in this codebase.

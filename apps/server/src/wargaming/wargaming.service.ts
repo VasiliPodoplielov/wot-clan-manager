@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
-import { ConfigService } from '@nestjs/config';
-import { firstValueFrom } from 'rxjs';
-import { ClanMemberStats } from './wargaming.models';
+import { Injectable } from "@nestjs/common";
+import { HttpService } from "@nestjs/axios";
+import { ConfigService } from "@nestjs/config";
+import { firstValueFrom } from "rxjs";
+import { ClanMemberStats } from "./wargaming.models";
 
 interface WgLoginParams {
   status: string;
@@ -19,14 +19,15 @@ export class WargamingService {
   private readonly authUrl: string;
   private readonly profileUrl: string;
   private readonly accountListUrl: string;
-  private baseWgEndpoint = 'https://api.worldoftanks.eu/wot';
+  private baseWgEndpoint = "https://api.worldoftanks.eu/wot";
 
   constructor(
     private readonly httpService: HttpService,
     private readonly configService: ConfigService,
   ) {
-    this.applicationId = this.configService.getOrThrow<string>('WG_APPLICATION_ID');
-    this.redirectUri = this.configService.getOrThrow<string>('WG_REDIRECT_URI');
+    this.applicationId =
+      this.configService.getOrThrow<string>("WG_APPLICATION_ID");
+    this.redirectUri = this.configService.getOrThrow<string>("WG_REDIRECT_URI");
     this.authUrl = `${this.baseWgEndpoint}/auth/login/`;
     this.profileUrl = `${this.baseWgEndpoint}/account/info/`;
     this.accountListUrl = `${this.baseWgEndpoint}/account/list/?${this.applicationId}`; //TODO: Check if it is save
@@ -35,8 +36,8 @@ export class WargamingService {
   buildLoginUrl(): string {
     const url = new URL(this.authUrl);
 
-    url.searchParams.set('application_id', this.applicationId);
-    url.searchParams.set('redirect_uri', this.redirectUri);
+    url.searchParams.set("application_id", this.applicationId);
+    url.searchParams.set("redirect_uri", this.redirectUri);
 
     return url.toString();
   }
@@ -44,20 +45,18 @@ export class WargamingService {
   async getProfileByAccountId(accountId: string) {
     const url = new URL(this.profileUrl);
 
-    url.searchParams.set('application_id', this.applicationId);
-    url.searchParams.set('account_id', accountId);
-    url.searchParams.set('fields', 'account_id,nickname,clan_id');
+    url.searchParams.set("application_id", this.applicationId);
+    url.searchParams.set("account_id", accountId);
+    url.searchParams.set("fields", "account_id,nickname,clan_id");
 
     const response$ = this.httpService.get(url.toString());
     const { data } = await firstValueFrom(response$);
 
-    if (data.status !== 'ok') {
-      throw new Error('Failed to fetch WG profile');
+    if (data.status !== "ok") {
+      throw new Error("Failed to fetch WG profile");
     }
 
     const [profile] = Object.values<any>(data.data);
-
-    console.log(data.data);
 
     return {
       accountId: profile.account_id,
@@ -66,18 +65,45 @@ export class WargamingService {
     };
   }
 
-  async findAccountByNickname(nickname: string) {
-    const url = new URL(this.accountListUrl);
+  // Підтверджує, що access_token з callback дійсно належить заявленому account_id.
+  // Поле `private` в /account/info повертається WG лише коли access_token валідний саме для цього акаунта.
+  private async verifyAccessToken(
+    accountId: string,
+    accessToken: string,
+  ): Promise<void> {
+    const url = new URL(this.profileUrl);
 
-    url.searchParams.set('application_id', this.applicationId);
-    url.searchParams.set('search', nickname);
-    url.searchParams.set('type', 'exact');
+    url.searchParams.set("application_id", this.applicationId);
+    url.searchParams.set("account_id", accountId);
+    url.searchParams.set("access_token", accessToken);
+    url.searchParams.set("fields", "account_id,private.email");
 
     const response$ = this.httpService.get(url.toString());
     const { data } = await firstValueFrom(response$);
 
-    if (data.status !== 'ok' || !Array.isArray(data.data) || data.data.length === 0) {
-      throw new Error('Wargaming account not found');
+    const profile = data?.data?.[accountId];
+
+    if (data.status !== "ok" || !profile || !profile.private) {
+      throw new Error("Invalid Wargaming access token");
+    }
+  }
+
+  async findAccountByNickname(nickname: string) {
+    const url = new URL(this.accountListUrl);
+
+    url.searchParams.set("application_id", this.applicationId);
+    url.searchParams.set("search", nickname);
+    url.searchParams.set("type", "exact");
+
+    const response$ = this.httpService.get(url.toString());
+    const { data } = await firstValueFrom(response$);
+
+    if (
+      data.status !== "ok" ||
+      !Array.isArray(data.data) ||
+      data.data.length === 0
+    ) {
+      throw new Error("Wargaming account not found");
     }
 
     const account = data.data[0];
@@ -89,9 +115,11 @@ export class WargamingService {
   }
 
   async handleCallback(params: WgLoginParams) {
-    if (params.status !== 'ok') {
-      throw new Error('Invalid Wargaming callback');
+    if (params.status !== "ok" || !params.access_token || !params.account_id) {
+      throw new Error("Invalid Wargaming callback");
     }
+
+    await this.verifyAccessToken(params.account_id, params.access_token);
 
     const profile = await this.getProfileByAccountId(params.account_id);
     return profile;
@@ -104,12 +132,12 @@ export class WargamingService {
 
     const { data: wgData } = await firstValueFrom(wgResponse$);
 
-    if (wgData.status !== 'ok' || !wgData.data[clanId]) {
-      throw new Error('Something went wrong with Wargaming API');
+    if (wgData.status !== "ok" || !wgData.data[clanId]) {
+      throw new Error("Something went wrong with Wargaming API");
     }
 
     const members = wgData.data[clanId].members;
-    const accountIds = members.map((m) => m.account_id).join(',');
+    const accountIds = members.map((m) => m.account_id).join(",");
 
     const statsResponse$ = this.httpService.get(
       `${this.baseWgEndpoint}/account/info/?application_id=${this.applicationId}&account_id=${accountIds}&fields=statistics.all.battles,statistics.all.wins`,
@@ -122,8 +150,8 @@ export class WargamingService {
     const { data: statsData } = await firstValueFrom(statsResponse$);
     const { data: ratingsData } = await firstValueFrom(ratingsResponse$);
 
-    if (statsData.status !== 'ok' || ratingsData.status !== 'ok') {
-      throw new Error('Wargaming API Error while fetching stats');
+    if (statsData.status !== "ok" || ratingsData.status !== "ok") {
+      throw new Error("Wargaming API Error while fetching stats");
     }
 
     return members.map((member) => {
