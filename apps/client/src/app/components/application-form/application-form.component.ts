@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   input,
   output,
@@ -10,11 +11,16 @@ import {
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { CheckboxModule } from 'primeng/checkbox';
 import { MessageModule } from 'primeng/message';
+import { MessageService } from 'primeng/api';
 import { TextareaModule } from 'primeng/textarea';
+import { ApplicationsService } from '../../services/applications-service';
+import { selectIsAuthenticated } from '../../store/auth/auth.selectors';
 
 export interface ApplicationFormValue {
   isReadyForPrime: boolean;
@@ -28,6 +34,7 @@ export interface ApplicationFormValue {
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    RouterModule,
     CardModule,
     CheckboxModule,
     TextareaModule,
@@ -39,13 +46,20 @@ export interface ApplicationFormValue {
 })
 export class ApplicationFormComponent {
   private readonly formBuilder = inject(FormBuilder);
+  private readonly applicationsService = inject(ApplicationsService);
+  private readonly store = inject(Store);
+  private readonly messageService = inject(MessageService);
 
+  readonly eventId = input.required<number>();
   readonly eventName = input('Маневри');
   readonly eventStartDate = input('DD.MM.YYYY');
   readonly eventEndDate = input('DD.MM.YYYY');
   readonly primeTime = input('21:00 - 23:00');
 
   readonly applicationSubmitted = output<ApplicationFormValue>();
+
+  readonly isLoggedIn = this.store.selectSignal(selectIsAuthenticated);
+  readonly alreadyApplied = signal(false);
 
   readonly submitting = signal(false);
   readonly submitAttempted = signal(false);
@@ -67,6 +81,21 @@ export class ApplicationFormComponent {
     return control.invalid && (control.touched || control.dirty || this.submitAttempted());
   });
 
+  constructor() {
+    effect(() => {
+      const eventId = this.eventId();
+
+      if (!this.isLoggedIn()) {
+        this.alreadyApplied.set(false);
+        return;
+      }
+
+      this.applicationsService
+        .checkMine(eventId)
+        .subscribe(application => this.alreadyApplied.set(!!application));
+    });
+  }
+
   async onSubmit(): Promise<void> {
     this.submitAttempted.set(true);
 
@@ -77,18 +106,28 @@ export class ApplicationFormComponent {
 
     this.submitting.set(true);
 
-    try {
-      await Promise.resolve();
+    const formValue = this.form.getRawValue();
 
-      this.applicationSubmitted.emit(this.form.getRawValue());
-      this.form.reset({
-        isReadyForPrime: false,
-        canLead: false,
-        additionalInfo: '',
-      });
-      this.submitAttempted.set(false);
-    } finally {
-      this.submitting.set(false);
-    }
+    this.applicationsService.submit({ eventId: this.eventId(), ...formValue }).subscribe({
+      next: () => {
+        this.applicationSubmitted.emit(formValue);
+        this.alreadyApplied.set(true);
+        this.form.reset({
+          isReadyForPrime: false,
+          canLead: false,
+          additionalInfo: '',
+        });
+        this.submitAttempted.set(false);
+        this.submitting.set(false);
+      },
+      error: err => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Помилка',
+          detail: err?.error?.message ?? 'Не вдалося надіслати заявку. Спробуйте пізніше.',
+        });
+        this.submitting.set(false);
+      },
+    });
   }
 }
