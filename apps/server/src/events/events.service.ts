@@ -8,7 +8,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { EntityManager, QueryFailedError, Repository } from "typeorm";
 import { Event } from "./entities/event.entity";
 import { EventStatus } from "./event.models";
-import { CreateEventDto } from "./event.types";
+import { CreateEventDto, EventPublicDto } from "./event.types";
 
 const POSTGRES_UNIQUE_VIOLATION = "23505";
 
@@ -19,10 +19,11 @@ export class EventsService {
     private eventsRepository: Repository<Event>,
   ) {}
 
-  async getActive(): Promise<Event | null> {
-    return this.eventsRepository.findOne({
+  async getActive(): Promise<EventPublicDto | null> {
+    const event = await this.eventsRepository.findOne({
       where: { status: EventStatus.ACTIVE },
     });
+    return event ? EventPublicDto.fromEntity(event) : null;
   }
 
   async findById(id: number): Promise<Event | null> {

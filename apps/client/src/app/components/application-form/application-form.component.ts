@@ -107,26 +107,29 @@ export class ApplicationFormComponent {
 
     const formValue = this.form.getRawValue();
 
-    this.applicationsService.submit({ eventId: this.eventId(), ...formValue }).subscribe({
-      next: () => {
-        this.applicationSubmitted.emit(formValue);
-        this.alreadyApplied.set(true);
-        this.form.reset({
-          isReadyForPrime: false,
-          canLead: false,
-          additionalInfo: '',
-        });
-        this.submitAttempted.set(false);
-        this.submitting.set(false);
-      },
-      error: err => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Помилка',
-          detail: err?.error?.message ?? 'Не вдалося надіслати заявку. Спробуйте пізніше.',
-        });
-        this.submitting.set(false);
-      },
-    });
+    this.applicationsService
+      .submit({ eventId: this.eventId(), ...formValue })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.applicationSubmitted.emit(formValue);
+          this.alreadyApplied.set(true);
+          this.form.reset({
+            isReadyForPrime: false,
+            canLead: false,
+            additionalInfo: '',
+          });
+          this.submitAttempted.set(false);
+          this.submitting.set(false);
+        },
+        error: err => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Помилка',
+            detail: err?.error?.message ?? 'Не вдалося надіслати заявку. Спробуйте пізніше.',
+          });
+          this.submitting.set(false);
+        },
+      });
   }
 }
