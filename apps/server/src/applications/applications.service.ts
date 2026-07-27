@@ -2,6 +2,7 @@ import {
   BadRequestException,
   ConflictException,
   Injectable,
+  ServiceUnavailableException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { QueryFailedError, Repository } from "typeorm";
@@ -49,7 +50,14 @@ export class ApplicationsService {
       );
     }
 
-    const stats = await this.wargamingService.getPlayerStats(user.wgAccountId);
+    let stats: { rating: number; battles: number; winRate: number };
+    try {
+      stats = await this.wargamingService.getPlayerStats(user.wgAccountId);
+    } catch {
+      throw new ServiceUnavailableException(
+        "Не вдалося отримати статистику Wargaming, спробуйте пізніше",
+      );
+    }
 
     const application = this.applicationsRepository.create({
       eventId: dto.eventId,

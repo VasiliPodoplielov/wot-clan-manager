@@ -3,16 +3,17 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  effect,
+  DestroyRef,
   inject,
   input,
   output,
   signal,
 } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { Store } from '@ngrx/store';
+import { of, switchMap } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { CheckboxModule } from 'primeng/checkbox';
@@ -81,19 +82,17 @@ export class ApplicationFormComponent {
     return control.invalid && (control.touched || control.dirty || this.submitAttempted());
   });
 
+  private readonly destroyRef = inject(DestroyRef);
+
   constructor() {
-    effect(() => {
-      const eventId = this.eventId();
-
-      if (!this.isLoggedIn()) {
-        this.alreadyApplied.set(false);
-        return;
-      }
-
-      this.applicationsService
-        .checkMine(eventId)
-        .subscribe(application => this.alreadyApplied.set(!!application));
-    });
+    toObservable(computed(() => ({ eventId: this.eventId(), isLoggedIn: this.isLoggedIn() })))
+      .pipe(
+        switchMap(({ eventId, isLoggedIn }) =>
+          isLoggedIn ? this.applicationsService.checkMine(eventId) : of(null),
+        ),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(application => this.alreadyApplied.set(!!application));
   }
 
   async onSubmit(): Promise<void> {

@@ -22,7 +22,15 @@ export class ApplicationsService {
         params: { eventId },
         headers: this.authHeaders(),
       })
-      .pipe(catchError(() => of(null)));
+      .pipe(
+        catchError(err => {
+          // Ендпоінт завжди повертає 200 з `null`, коли заявки немає — тож будь-яка
+          // помилка тут (401/403/мережа/5xx) реальна, і її треба хоча б залогувати,
+          // а не мовчки видавати за "заявки немає".
+          console.error('Не вдалося перевірити статус заявки:', err);
+          return of(null);
+        }),
+      );
   }
 
   private authHeaders(): HttpHeaders {

@@ -3,10 +3,17 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  Index,
 } from "typeorm";
 import { EventStatus } from "../event.models";
 
+// Гарантує на рівні БД, що активною може бути лише одна подія одночасно
+// (навіть при паралельних запитах на активацію).
 @Entity("events")
+@Index("uq_events_single_active", ["status"], {
+  unique: true,
+  where: `"status" = 'active'`,
+})
 export class Event {
   @PrimaryGeneratedColumn()
   id: number;

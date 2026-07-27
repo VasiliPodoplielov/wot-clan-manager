@@ -1,13 +1,16 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { EntityManager, QueryFailedError, Repository } from "typeorm";
 import { Event } from "./entities/event.entity";
 import { EventStatus } from "./event.models";
 import { CreateEventDto } from "./event.types";
+
+const POSTGRES_UNIQUE_VIOLATION = "23505";
 
 @Injectable()
 export class EventsService {
@@ -33,46 +36,64 @@ export class EventsService {
     if (!dto.startDate || !dto.endDate) {
       throw new BadRequestException("Дати початку та завершення обов'язкові");
     }
-    if (dto.status && !Object.values(EventStatus).includes(dto.status)) {
-      throw new BadRequestException("Невірний статус події");
-    }
 
-    if (dto.status === EventStatus.ACTIVE) {
-      await this.deactivateAllActive();
-    }
+    return this.runActivationSafe(async (manager) => {
+      if (dto.status === EventStatus.ACTIVE) {
+        await this.deactivateAllActive(manager);
+      }
 
-    const event = this.eventsRepository.create({
-      name: dto.name,
-      startDate: dto.startDate,
-      endDate: dto.endDate,
-      primeTime: dto.primeTime,
-      status: dto.status ?? EventStatus.CLOSED,
-      createdByUserId,
+      const event = manager.create(Event, {
+        name: dto.name,
+        startDate: dto.startDate,
+        endDate: dto.endDate,
+        primeTime: dto.primeTime,
+        status: dto.status ?? EventStatus.CLOSED,
+        createdByUserId,
+      });
+
+      return manager.save(event);
     });
-
-    return this.eventsRepository.save(event);
   }
 
   async setStatus(id: number, status: EventStatus): Promise<Event> {
-    if (!Object.values(EventStatus).includes(status)) {
-      throw new BadRequestException("Невірний статус події");
-    }
-
     const event = await this.findById(id);
     if (!event) {
       throw new NotFoundException("Подію не знайдено");
     }
 
-    if (status === EventStatus.ACTIVE) {
-      await this.deactivateAllActive();
-    }
+    return this.runActivationSafe(async (manager) => {
+      if (status === EventStatus.ACTIVE) {
+        await this.deactivateAllActive(manager);
+      }
 
-    event.status = status;
-    return this.eventsRepository.save(event);
+      event.status = status;
+      return manager.save(event);
+    });
   }
 
-  private async deactivateAllActive(): Promise<void> {
-    await this.eventsRepository.update(
+  // Деактивація попередньої активної події та активація нової виконуються
+  // в одній транзакції — інваріант "лише одна активна подія" додатково
+  // гарантований partial unique index на рівні БД (event.entity.ts).
+  private async runActivationSafe(
+    work: (manager: EntityManager) => Promise<Event>,
+  ): Promise<Event> {
+    try {
+      return await this.eventsRepository.manager.transaction(work);
+    } catch (error) {
+      if (
+        error instanceof QueryFailedError &&
+        (error.driverError as { code?: string })?.code ===
+          POSTGRES_UNIQUE_VIOLATION
+      ) {
+        throw new ConflictException("Вже є активна подія, спробуйте ще раз");
+      }
+      throw error;
+    }
+  }
+
+  private async deactivateAllActive(manager: EntityManager): Promise<void> {
+    await manager.update(
+      Event,
       { status: EventStatus.ACTIVE },
       { status: EventStatus.CLOSED },
     );

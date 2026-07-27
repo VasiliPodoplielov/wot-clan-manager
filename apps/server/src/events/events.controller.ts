@@ -11,7 +11,7 @@ import {
 } from "@nestjs/common";
 import type { Request } from "express";
 import { EventsService } from "./events.service";
-import type { CreateEventDto, UpdateEventStatusDto } from "./event.types";
+import { CreateEventDto, UpdateEventStatusDto } from "./event.types";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { Roles } from "../auth/decorators/roles.decorator";

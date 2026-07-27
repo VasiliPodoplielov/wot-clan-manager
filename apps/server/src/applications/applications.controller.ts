@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  ParseIntPipe,
   Post,
   Query,
   Req,
@@ -9,7 +10,7 @@ import {
 } from "@nestjs/common";
 import type { Request } from "express";
 import { ApplicationsService } from "./applications.service";
-import type { SubmitApplicationDto } from "./application.types";
+import { SubmitApplicationDto } from "./application.types";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import type { AuthJwtPayload } from "../auth/auth.types";
 
@@ -28,9 +29,9 @@ export class ApplicationsController {
 
   @Get("mine")
   findMine(
-    @Query("eventId") eventId: string,
+    @Query("eventId", ParseIntPipe) eventId: number,
     @Req() req: Request & { user: AuthJwtPayload },
   ) {
-    return this.applicationsService.findMine(req.user.sub, Number(eventId));
+    return this.applicationsService.findMine(req.user.sub, eventId);
   }
 }
