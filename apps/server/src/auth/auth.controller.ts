@@ -32,17 +32,18 @@ export class AuthController {
   async wgCallback(@Query() query: any, @Res() res: Response) {
     const FRONT_URL = process.env.FRONT_URL ?? 'http://localhost:4200';
 
-    // Якщо користувач натиснув "cancel" або щось пішло не так на боці WG — просто редіректимо на головну
+    // Якщо користувач натиснув "cancel" або щось пішло не так на боці WG — редіректимо з помилкою
     if (query.status !== 'ok' || !query.access_token || !query.account_id) {
-      return res.redirect(302, FRONT_URL);
+      return res.redirect(302, `${FRONT_URL}/auth/callback#error=wg_login_failed`);
     }
 
     try {
       const result = await this.authService.loginWithWargaming(query);
       const redirectUrl = `${FRONT_URL}/auth/callback#token=${encodeURIComponent(result.token)}`;
       return res.redirect(302, redirectUrl);
-    } catch {
-      return res.redirect(302, FRONT_URL);
+    } catch (error) {
+      console.error('WG login failed:', error);
+      return res.redirect(302, `${FRONT_URL}/auth/callback#error=wg_login_failed`);
     }
   }
 }

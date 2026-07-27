@@ -67,6 +67,8 @@ export class WargamingService {
 
   // Підтверджує, що access_token з callback дійсно належить заявленому account_id.
   // Поле `private` в /account/info повертається WG лише коли access_token валідний саме для цього акаунта.
+  // `private.email` у WoT API не існує (WG повертає INVALID_FIELDS) — використовуємо
+  // будь-яке легке приватне поле, воно тут лише для факту наявності блоку `private`.
   private async verifyAccessToken(
     accountId: string,
     accessToken: string,
@@ -76,7 +78,7 @@ export class WargamingService {
     url.searchParams.set("application_id", this.applicationId);
     url.searchParams.set("account_id", accountId);
     url.searchParams.set("access_token", accessToken);
-    url.searchParams.set("fields", "account_id,private.email");
+    url.searchParams.set("fields", "account_id,private.is_premium");
 
     const response$ = this.httpService.get(url.toString());
     const { data } = await firstValueFrom(response$);
@@ -168,5 +170,34 @@ export class WargamingService {
         winRate: battles > 0 ? Number(((wins / battles) * 100).toFixed(2)) : 0,
       };
     });
+  }
+
+  async getPlayerStats(
+    accountId: string,
+  ): Promise<{ rating: number; battles: number; winRate: number }> {
+    const statsResponse$ = this.httpService.get(
+      `${this.baseWgEndpoint}/account/info/?application_id=${this.applicationId}&account_id=${accountId}&fields=statistics.all.battles,statistics.all.wins`,
+    );
+
+    const ratingResponse$ = this.httpService.get(
+      `${this.baseWgEndpoint}/account/wtr/?application_id=${this.applicationId}&account_id=${accountId}&fields=rating`,
+    );
+
+    const { data: statsData } = await firstValueFrom(statsResponse$);
+    const { data: ratingData } = await firstValueFrom(ratingResponse$);
+
+    if (statsData.status !== "ok" || ratingData.status !== "ok") {
+      throw new Error("Wargaming API Error while fetching player stats");
+    }
+
+    const playerStats = statsData.data[accountId];
+    const battles = playerStats?.statistics?.all?.battles || 0;
+    const wins = playerStats?.statistics?.all?.wins || 0;
+
+    return {
+      rating: ratingData.data[accountId]?.rating || 0,
+      battles,
+      winRate: battles > 0 ? Number(((wins / battles) * 100).toFixed(2)) : 0,
+    };
   }
 }

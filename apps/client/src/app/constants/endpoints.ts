@@ -1,6 +1,8 @@
 const BASE_API_URL = 'http://localhost:3000';
 const BASE_AUTH_URL = `${BASE_API_URL}/auth`;
 const BASE_WARGAMING_API_URL = `${BASE_API_URL}/wargaming`;
+const BASE_EVENTS_API_URL = `${BASE_API_URL}/events`;
+const BASE_APPLICATIONS_API_URL = `${BASE_API_URL}/applications`;
 
 export const endpoints = {
   auth: {
@@ -9,5 +11,12 @@ export const endpoints = {
   },
   wargaming: {
     clanMembers: `${BASE_WARGAMING_API_URL}/clan-members`,
+  },
+  events: {
+    active: `${BASE_EVENTS_API_URL}/active`,
+  },
+  applications: {
+    create: BASE_APPLICATIONS_API_URL,
+    mine: `${BASE_APPLICATIONS_API_URL}/mine`,
   },
 };

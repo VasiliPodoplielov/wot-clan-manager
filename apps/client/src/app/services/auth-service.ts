@@ -51,6 +51,10 @@ export class AuthService {
     return jwtDecode<DecodedToken>(token);
   }
 
+  getToken(): string | null {
+    return localStorage.getItem(AuthService.TOKEN_STORAGE_KEY);
+  }
+
   login(credentials: ILoginData): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(endpoints.auth.login, credentials).pipe(
       tap(({ access_token }) => {
