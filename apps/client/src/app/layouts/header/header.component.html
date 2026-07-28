@@ -19,6 +19,18 @@
               </span>
             </div>
 
+            @if (isAdmin()) {
+              <button
+                pButton
+                icon="pi pi-shield"
+                label="Адмін-панель"
+                class="p-button-rounded p-button-outlined p-button-sm"
+                (click)="navigateTo('/admin/players')"
+                pTooltip="Керування ролями гравців"
+                tooltipPosition="bottom"
+              ></button>
+            }
+
             <p-divider layout="vertical" class="mx-0"></p-divider>
 
             <button

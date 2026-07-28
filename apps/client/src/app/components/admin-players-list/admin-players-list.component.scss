@@ -1,0 +1,18 @@
+.admin-players-container {
+  max-width: 1300px;
+  margin: 0 auto;
+
+  ::v-deep {
+    .p-datatable-header {
+      background: white;
+      padding: 1.5rem;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+    }
+
+    .p-paginator {
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
+    }
+  }
+}

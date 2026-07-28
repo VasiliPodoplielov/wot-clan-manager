@@ -1,0 +1,74 @@
+<div class="admin-players-container p-4">
+  <div class="header-section mb-4 flex justify-content-between align-items-center">
+    <h2 class="m-0">Керування ролями гравців</h2>
+  </div>
+
+  <p-table
+    #dt
+    [value]="players()"
+    [loading]="loading()"
+    [rows]="15"
+    [paginator]="true"
+    [globalFilterFields]="['nickname', 'email']"
+    responsiveLayout="stack"
+    [breakpoint]="'960px'"
+    styleClass="p-datatable-striped shadow-2 border-round-xl overflow-hidden"
+  >
+    <ng-template pTemplate="caption">
+      <div class="flex justify-content-end">
+        <p-iconfield iconPosition="left">
+          <p-inputicon class="pi pi-search"></p-inputicon>
+          <input
+            pInputText
+            type="text"
+            (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+            placeholder="Пошук гравця..."
+          />
+        </p-iconfield>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th pSortableColumn="nickname">Нікнейм <p-sortIcon field="nickname"></p-sortIcon></th>
+        <th pSortableColumn="email">Email <p-sortIcon field="email"></p-sortIcon></th>
+        <th>WG-звання</th>
+        <th>Роль застосунку</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-player>
+      <tr>
+        <td>
+          <span class="font-bold">{{ player.nickname }}</span>
+        </td>
+        <td>{{ player.email || '—' }}</td>
+        <td>
+          @if (player.wgRole) {
+            <p-tag [value]="player.wgRole" severity="secondary"></p-tag>
+          } @else {
+            <span class="text-color-secondary">—</span>
+          }
+        </td>
+        <td>
+          <p-select
+            #roleModel="ngModel"
+            [ngModel]="player.role"
+            (ngModelChange)="onRoleChange(player, $event, roleModel)"
+            [options]="roleOptions"
+            optionLabel="label"
+            optionValue="value"
+            styleClass="w-12rem"
+            appendTo="body"
+          ></p-select>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="4" class="text-center">Гравців не знайдено.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

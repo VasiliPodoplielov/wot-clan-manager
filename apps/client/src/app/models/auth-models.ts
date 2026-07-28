@@ -1,7 +1,7 @@
 export enum UserRole {
-  MEMBER = 'member',
-  OFFICER = 'officer',
-  MODERATOR = 'moderator',
+  ADMIN = 'admin',
+  USER = 'user',
+  GUEST = 'guest',
 }
 
 export interface DecodedToken {

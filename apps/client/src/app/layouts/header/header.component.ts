@@ -8,11 +8,12 @@ import { Store } from '@ngrx/store';
 import { AuthService } from '../../services/auth-service';
 import { selectIsAuthenticated, selectNickname } from '../../store/auth/auth.selectors';
 import { DividerModule } from 'primeng/divider';
+import { TooltipModule } from 'primeng/tooltip';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, MenubarModule, ButtonModule, DividerModule],
+  imports: [CommonModule, MenubarModule, ButtonModule, DividerModule, TooltipModule],
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
 })
@@ -24,6 +25,7 @@ export class HeaderComponent {
 
   isLoggedIn = this.store.selectSignal(selectIsAuthenticated);
   nickname = this.store.selectSignal(selectNickname);
+  isAdmin = this.authService.isAdmin;
 
   constructor(private router: Router) {
     this.items = [

@@ -23,8 +23,7 @@ export class AuthService {
 
   currentUser = signal<DecodedToken | null>(null);
 
-  isModerator = computed(() => this.currentUser()?.role === UserRole.MODERATOR);
-  isOfficer = computed(() => this.currentUser()?.role === UserRole.OFFICER || this.isModerator());
+  isAdmin = computed(() => this.currentUser()?.role === UserRole.ADMIN);
 
   constructor() {
     const storedUser = this.getStoredUser();
