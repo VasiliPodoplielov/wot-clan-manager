@@ -7,7 +7,7 @@ import Aura from '@primeuix/themes/aura';
 import { provideHttpClient } from '@angular/common/http';
 import { provideStore } from '@ngrx/store';
 import { authReducer } from './store/auth/auth.reducer';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -26,5 +26,6 @@ export const appConfig: ApplicationConfig = {
       auth: authReducer,
     }),
     MessageService,
+    ConfirmationService,
   ],
 };

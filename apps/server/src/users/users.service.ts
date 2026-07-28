@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import { UserRole } from './user.models';
 import { WargamingService } from '../wargaming/wargaming.service';
 
 @Injectable()
@@ -50,6 +51,28 @@ export class UsersService {
       nickname,
     });
 
+    return this.usersRepository.save(user);
+  }
+
+  async findAll(): Promise<User[]> {
+    return this.usersRepository.find({ order: { createdAt: 'ASC' } });
+  }
+
+  async findById(id: number): Promise<User | null> {
+    return this.usersRepository.findOne({ where: { id } });
+  }
+
+  async updateRole(id: number, role: UserRole, requesterId: number): Promise<User> {
+    if (id === requesterId) {
+      throw new ConflictException('Не можна змінити власну роль');
+    }
+
+    const user = await this.findById(id);
+    if (!user) {
+      throw new NotFoundException('Користувача не знайдено');
+    }
+
+    user.role = role;
     return this.usersRepository.save(user);
   }
 }

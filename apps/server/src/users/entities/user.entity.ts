@@ -24,7 +24,7 @@ export class User {
   @Column({
     type: 'enum',
     enum: UserRole,
-    default: UserRole.MEMBER, // За замовчуванням всі — учасники
+    default: UserRole.USER, // За замовчуванням новий гравець — user
   })
   role: UserRole;
 

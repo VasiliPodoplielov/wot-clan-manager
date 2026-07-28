@@ -29,7 +29,7 @@ export class EventsController {
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.OFFICER, UserRole.MODERATOR)
+  @Roles(UserRole.ADMIN)
   create(
     @Body() dto: CreateEventDto,
     @Req() req: Request & { user: AuthJwtPayload },
@@ -39,7 +39,7 @@ export class EventsController {
 
   @Patch(":id/status")
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.OFFICER, UserRole.MODERATOR)
+  @Roles(UserRole.ADMIN)
   setStatus(
     @Param("id", ParseIntPipe) id: number,
     @Body() dto: UpdateEventStatusDto,
